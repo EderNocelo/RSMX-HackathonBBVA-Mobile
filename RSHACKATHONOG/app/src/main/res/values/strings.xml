@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">RS-HACKATHON-OG</string>
+
+    <!-- COMMON STRINGS -->
+    <string name="owner_name">ROOT SYSTEMS MX</string>
+    <string name="event_name">Hackathon BBVA 2020</string>
+
 </resources>
