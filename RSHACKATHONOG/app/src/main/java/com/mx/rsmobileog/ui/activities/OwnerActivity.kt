@@ -1,21 +1,26 @@
 package com.mx.rsmobileog.ui.activities
 
 import android.Manifest
+import android.app.AlarmManager
+import android.app.Notification
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
 import com.mx.rsmobileog.R
 import com.mx.rsmobileog.databinding.OwnerActivityBinding
-import com.mx.rsmobileog.databinding.SplashActivityBinding
+import com.mx.rsmobileog.tools.LocalNotificationManager
 import com.mx.rsmobileog.tools.Tools
-import kotlin.system.exitProcess
+
 
 class OwnerActivity : AppCompatActivity() {
 
@@ -133,5 +138,34 @@ class OwnerActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
+        //scheduleNotification(getNotification("Local notification", "Awesome message")!!)
+    }
+
+    private fun scheduleNotification(notification: Notification) {
+        val notificationIntent = Intent(this, LocalNotificationManager::class.java)
+        notificationIntent.putExtra(LocalNotificationManager.NOTIFICATION_ID, 1)
+        notificationIntent.putExtra(LocalNotificationManager.NOTIFICATION, notification)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            0,
+            notificationIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val futureInMillis: Long = SystemClock.elapsedRealtime() + 5000
+        val alarmManager =
+            (getSystemService(Context.ALARM_SERVICE) as AlarmManager)
+        alarmManager[AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis] = pendingIntent
+    }
+
+    private fun getNotification(title:String, message: String): Notification? {
+        val builder: NotificationCompat.Builder = NotificationCompat.Builder(this, LocalNotificationManager.NOTIFICATION_CHANNEL_ID)
+        builder.setContentTitle(title)
+        builder.setContentText(message)
+        builder.setSmallIcon(R.drawable.ic_near)
+        builder.setAutoCancel(true)
+        builder.setVibrate(longArrayOf(500, 500))
+        builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
+        builder.setChannelId(LocalNotificationManager.NOTIFICATION_CHANNEL_ID)
+        return builder.build()
     }
 }

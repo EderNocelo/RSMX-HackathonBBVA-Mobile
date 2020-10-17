@@ -41,6 +41,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlin_version}"
     implementation "com.android.support:multidex:${versions.multidex}"
+    implementation "com.android.support:support-compat:${versions.supportCompat}"
 
     // Android UI elements
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
