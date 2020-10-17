@@ -5,11 +5,11 @@
             android:icon="@drawable/ic_settings"
             android:title="Ajustes"/>
     <item
-        android:id="@+id/navigation_pallets"
+        android:id="@+id/navigation_offers"
         android:title=""
             />
     <item
-            android:id="@+id/navigation_fav"
+            android:id="@+id/navigation_favorites"
             android:icon="@drawable/ic_fav"
-            android:title="Promociones"/>
+            android:title="Favoritos"/>
 </menu>

@@ -15,11 +15,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.google.android.material.bottomnavigation.LabelVisibilityMode
+import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mx.rsmobileog.R
 import com.mx.rsmobileog.databinding.OwnerActivityBinding
 import com.mx.rsmobileog.tools.LocalNotificationManager
 import com.mx.rsmobileog.tools.Tools
+import com.mx.rsmobileog.ui.fragments.FavoritesFragment
+import com.mx.rsmobileog.ui.fragments.OffersNearFragment
+import com.mx.rsmobileog.ui.fragments.SettingsFragment
 
 
 class OwnerActivity : AppCompatActivity() {
@@ -30,6 +34,34 @@ class OwnerActivity : AppCompatActivity() {
     // Permissions codes
     private val LOCATION_REQUEST_CODE = 101
     private val WRITE_REQUEST_CODE = 102
+
+    private var settingsFragment:SettingsFragment? = null
+    private var offersFragment:OffersNearFragment? = null
+    private var favoritesFragment:FavoritesFragment? = null
+
+    /**
+     * Init listener by clicked option on Bottom menu
+     * */
+    private val mOnNavigationItemSelectedListener =
+        BottomNavigationView.OnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_settings -> {
+                    fragmentTransaction(getSettingsFragment() ,"settings")
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.navigation_offers -> {
+                    fragmentTransaction(getOffersFragment(),"offers")
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.navigation_favorites -> {
+                    fragmentTransaction(getFavoritesFragment(),"favorites")
+                    return@OnNavigationItemSelectedListener true
+                }
+
+            }
+            false
+        }
+
 
     /**
      * Instantiate activity
@@ -49,34 +81,58 @@ class OwnerActivity : AppCompatActivity() {
         setContentView(bindingView.root)
         // hide title bar
         supportActionBar!!.hide()
-        // add main menu
-        inflateCurrentMenu()
+        // init nav
+        initNavigation()
+    }
+
+    private fun initNavigation(){
+        bindingView.bnvMainMenu.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        bindingView.bnvMainMenu.selectedItemId = R.id.navigation_offers
     }
 
     override fun onResume() {
         super.onResume()
-    }
-
-    /**
-     * This method call to inflate menu for INVENTORY
-     * */
-    private fun inflateCurrentMenu() {
-        bindingView.bnvMainMenu.menu.clear()
-        bindingView.bnvMainMenu.inflateMenu(R.menu.navigation_main)
-        bindingView.bnvMainMenu.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_LABELED
-    }
-
-
-    /** OPEN APP ABOUT AND MULTIMEDIA SETTINGS DIALOG **/
-    private fun addActions() {
-        opensAboutApp()
-    }
-
-    private fun opensAboutApp() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission()
         } else {
             //displaysAbout()
+        }*/
+    }
+
+    /**
+     * This method executes transaction by last fragment to next. Uses viewModel.lastActiveFragmentTag for updates current.
+     * */
+    private fun fragmentTransaction(fragment: Fragment, tag: String) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.flContainer, fragment)
+            .commitNow()
+    }
+
+    private fun getSettingsFragment(): SettingsFragment {
+        settingsFragment?.let {
+            return it
+        } ?: run {
+            settingsFragment = SettingsFragment.getInstance()
+            return settingsFragment!!
+        }
+    }
+
+    private fun getOffersFragment(): OffersNearFragment {
+        offersFragment?.let {
+            return it
+        } ?: run {
+            offersFragment = OffersNearFragment.getInstance()
+            return offersFragment!!
+        }
+    }
+
+    private fun getFavoritesFragment(): FavoritesFragment {
+        favoritesFragment?.let {
+            return it
+        } ?: run {
+            favoritesFragment = FavoritesFragment.getInstance()
+            return favoritesFragment!!
         }
     }
 
@@ -98,7 +154,6 @@ class OwnerActivity : AppCompatActivity() {
         )
     }
 
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -108,7 +163,7 @@ class OwnerActivity : AppCompatActivity() {
         when (requestCode) {
             LOCATION_REQUEST_CODE -> {
                 if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Tools.displayToast(this, "R.string.mailbox_location_permissions_fail")
+                    Tools.displayToast(this, "location is unavailable")
                 } else {
                     // displaysAbout()
                 }
@@ -131,6 +186,7 @@ class OwnerActivity : AppCompatActivity() {
             }
         }
     }
+
 
     override fun onStop() {
         super.onStop()
