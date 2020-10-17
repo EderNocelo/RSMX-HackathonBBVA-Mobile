@@ -10,11 +10,18 @@ import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.material.bottomnavigation.LabelVisibilityMode
 import com.mx.rsmobileog.R
+import com.mx.rsmobileog.databinding.OwnerActivityBinding
+import com.mx.rsmobileog.databinding.SplashActivityBinding
 import com.mx.rsmobileog.tools.Tools
 import kotlin.system.exitProcess
 
 class OwnerActivity : AppCompatActivity() {
+
+    // binding main layout
+    private lateinit var bindingView: OwnerActivityBinding
+
     // Permissions codes
     private val LOCATION_REQUEST_CODE = 101
     private val WRITE_REQUEST_CODE = 102
@@ -32,17 +39,28 @@ class OwnerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // load layout
-        setContentView(R.layout.owner_activity)
+        // inflate and load layout
+        bindingView = OwnerActivityBinding.inflate(layoutInflater)
+        setContentView(bindingView.root)
         // hide title bar
         supportActionBar!!.hide()
-
-        addActions()
+        // add main menu
+        inflateCurrentMenu()
     }
 
     override fun onResume() {
         super.onResume()
     }
+
+    /**
+     * This method call to inflate menu for INVENTORY
+     * */
+    private fun inflateCurrentMenu() {
+        bindingView.bnvMainMenu.menu.clear()
+        bindingView.bnvMainMenu.inflateMenu(R.menu.navigation_main)
+        bindingView.bnvMainMenu.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_LABELED
+    }
+
 
     /** OPEN APP ABOUT AND MULTIMEDIA SETTINGS DIALOG **/
     private fun addActions() {
@@ -111,16 +129,9 @@ class OwnerActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        exitFromApp()
-    }
-
-    fun exitFromApp(){
-        moveTaskToBack(true)
-        exitProcess(-1)
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        exitFromApp()
     }
 }
